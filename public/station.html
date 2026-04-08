@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupplyOne Document Station — Wisconsin</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary:   #203731;
+    --primary-h: #2a4a3f;
+    --primary-d: #1a2d28;
+    --gold:      #FFB612;
+    --bg:        #f4f5f7;
+    --card:      #ffffff;
+    --text:      #1a1a2e;
+    --muted:     #6b7280;
+    --border:    #e5e7eb;
+    --radius:    10px;
+    --shadow:    0 2px 12px rgba(32,55,49,0.10);
+  }
+  html, body { height: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); }
+
+  /* ===== HEADER ===== */
+  #appHeader {
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 60px;
+    box-shadow: 0 2px 8px rgba(32,55,49,0.25);
+    position: sticky; top: 0; z-index: 100;
+  }
+  #appHeader .logo { height: 36px; margin-right: 14px; }
+  #appHeader .header-text { flex: 1; }
+  #appHeader .header-text h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: .02em; }
+  #appHeader .header-text p { font-size: .78rem; opacity: .82; margin-top: 1px; }
+  #staTitle { font-size: 1.15rem; font-weight: 700; }
+  #staSub   { font-size: .78rem; opacity: .82; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .header-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; border-radius: 6px;
+    padding: 6px 13px; font-size: .82rem; cursor: pointer;
+    transition: background .15s;
+  }
+  .header-btn:hover { background: rgba(255,255,255,0.22); }
+  .gold-btn {
+    background: var(--gold); color: #203731; border: none;
+    font-weight: 700; border-radius: 6px;
+    padding: 6px 14px; font-size: .82rem; cursor: pointer;
+    transition: filter .15s;
+  }
+  .gold-btn:hover { filter: brightness(1.08); }
+
+  /* ===== MAIN LAYOUT ===== */
+  #appBody { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  #sidebar {
+    width: 270px; min-width: 220px; max-width: 320px;
+    background: var(--card);
+    border-right: 2px solid var(--gold);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  #sidebarTop { padding: 14px 14px 0; }
+  #searchWrap { position: relative; margin-bottom: 10px; }
+  #searchInput {
+    width: 100%; padding: 8px 34px 8px 12px;
+    border: 1.5px solid var(--border); border-radius: 7px;
+    font-size: .87rem; outline: none; transition: border-color .15s;
+  }
+  #searchInput:focus { border-color: var(--primary); }
+  #searchClear {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem;
+    display: none;
+  }
+  #categoryList { flex: 1; overflow-y: auto; padding: 0 8px 14px; }
+  .cat-section { margin-bottom: 4px; }
+  .cat-header {
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 8px; border-radius: 7px; cursor: pointer;
+    font-weight: 600; font-size: .84rem; color: var(--primary);
+    user-select: none; transition: background .12s;
+  }
+  .cat-header:hover { background: #f0f4f3; }
+  .cat-header .cat-arrow { font-size: .7rem; transition: transform .18s; margin-left: auto; }
+  .cat-header.open .cat-arrow { transform: rotate(90deg); }
+  .cat-docs { display: none; padding-left: 12px; }
+  .cat-docs.open { display: block; }
+  .doc-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 6px; cursor: pointer;
+    font-size: .82rem; color: var(--text); transition: background .12s;
+  }
+  .doc-item:hover { background: #f0f4f3; }
+  .doc-item.active { background: rgba(32,55,49,0.10); color: var(--primary); font-weight: 600; }
+  .doc-icon { font-size: 1rem; flex-shrink: 0; }
+  .doc-badge {
+    margin-left: auto; background: var(--gold); color: #203731;
+    font-size: .68rem; font-weight: 700; border-radius: 10px; padding: 1px 6px;
+  }
+  #recentSection { padding: 0 14px 10px; border-bottom: 1px solid var(--border); }
+  .section-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
+  .recent-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 5px 6px; border-radius: 6px; cursor: pointer;
+    font-size: .8rem; color: var(--text); transition: background .12s;
+  }
+  .recent-item:hover { background: #f0f4f3; }
+  #sidebarStatus { padding: 8px 14px; font-size: .72rem; color: var(--muted); border-top: 1px solid var(--border); }
+  #statusDot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; margin-right: 5px; }
+  #statusDot.live { background: #22c55e; }
+  #statusDot.error { background: #ef4444; }
+
+  /* ===== CONTENT AREA ===== */
+  #contentArea {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden; background: var(--bg);
+  }
+  #contentToolbar {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 8px 18px; display: flex; align-items: center; gap: 10px;
+    min-height: 48px;
+  }
+  #docTitle { font-size: .95rem; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #docMeta { font-size: .75rem; color: var(--muted); }
+  .tool-btn {
+    background: none; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 5px 11px; font-size: .8rem; cursor: pointer; color: var(--text);
+    transition: border-color .12s, background .12s;
+  }
+  .tool-btn:hover { border-color: var(--primary); background: #f0f4f3; }
+  #viewerWrap { flex: 1; overflow: hidden; position: relative; }
+
+  /* ===== VIEWER STATES ===== */
+  #splashScreen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #162d27 0%, #203731 60%, #2a4a3f 100%);
+    color: #fff;
+  }
+  #splashScreen .splash-logo { height: 54px; margin-bottom: 18px; filter: brightness(0) invert(1); opacity: .85; }
+  #splashScreen h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+  #splashScreen p { font-size: .92rem; opacity: .75; max-width: 380px; text-align: center; }
+  #splashScreen .splash-badge {
+    margin-top: 28px; background: var(--gold); color: #203731;
+    border-radius: 8px; padding: 7px 18px; font-size: .85rem; font-weight: 700;
+  }
+
+  /* ===== PDF VIEWER ===== */
+  #pdfViewer {
+    display: none; position: absolute; inset: 0; flex-direction: column;
+    background: #152b25;
+  }
+  #pdfViewer.active { display: flex; }
+  #pdfToolbar {
+    background: #0f201b; border-bottom: 2px solid var(--gold);
+    display: flex; align-items: center; gap: 8px; padding: 6px 14px;
+    flex-shrink: 0;
+  }
+  #pdfToolbar button {
+    background: rgba(32,55,49,0.6); border: 1px solid rgba(255,182,18,0.3);
+    color: #fff; border-radius: 5px; padding: 5px 10px; font-size: .8rem;
+    cursor: pointer; transition: background .12s;
+  }
+  #pdfToolbar button:hover { background: rgba(255,182,18,0.15); }
+  #pdfPageInfo { color: #fff; font-size: .82rem; min-width: 90px; text-align: center; }
+  #pdfFilename { color: rgba(255,255,255,0.7); font-size: .8rem; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #pdfCanvas { flex: 1; overflow: auto; display: flex; justify-content: center; align-items: flex-start; padding: 16px; }
+  #pdfCanvas canvas { box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
+
+  /* ===== IMAGE VIEWER ===== */
+  #imgViewer {
+    display: none; position: absolute; inset: 0;
+    align-items: center; justify-content: center;
+    background: #0f201b; flex-direction: column;
+  }
+  #imgViewer.active { display: flex; }
+  #imgViewer img { max-width: 90%; max-height: 85vh; border: 3px solid var(--gold); border-radius: 6px; box-shadow: 0 4px 24px rgba(0,0,0,0.5); }
+  #imgViewer .img-name { color: rgba(255,255,255,0.7); font-size: .8rem; margin-top: 10px; }
+
+  /* ===== EMBED VIEWER ===== */
+  #embedViewer {
+    display: none; position: absolute; inset: 0; flex-direction: column;
+    background: #152b25;
+  }
+  #embedViewer.active { display: flex; }
+  #embedViewer iframe { flex: 1; border: none; }
+
+  /* ===== LOADING OVERLAY ===== */
+  #loadingOverlay {
+    display: none; position: absolute; inset: 0;
+    background: rgba(32,55,49,0.75); align-items: center; justify-content: center;
+    flex-direction: column; gap: 14px; z-index: 50;
+  }
+  #loadingOverlay.active { display: flex; }
+  .spinner {
+    width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loadingOverlay p { color: #fff; font-size: .9rem; }
+
+  /* ===== ERROR OVERLAY ===== */
+  #errorOverlay {
+    display: none; position: absolute; inset: 0;
+    background: rgba(15,32,27,0.92); align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px; z-index: 51;
+  }
+  #errorOverlay.active { display: flex; }
+  #errorOverlay .err-icon { font-size: 2.5rem; }
+  #errorOverlay p { color: #fff; font-size: .95rem; text-align: center; max-width: 360px; }
+  #errorOverlay button {
+    background: var(--gold); color: #203731; border: none;
+    border-radius: 7px; padding: 8px 20px; font-weight: 700; cursor: pointer;
+    font-size: .88rem;
+  }
+
+  /* ===== CONFIG MODAL ===== */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 200; align-items: center; justify-content: center;
+  }
+  .modal-backdrop.active { display: flex; }
+  .modal {
+    background: var(--card); border-radius: 12px; padding: 26px 28px;
+    width: 480px; max-width: 96vw; box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .modal h2 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 18px; }
+  .modal-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted);
+  }
+  .form-row { margin-bottom: 14px; }
+  .form-row label { display: block; font-size: .82rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  .form-row input, .form-row select {
+    width: 100%; padding: 8px 12px; border: 1.5px solid var(--border);
+    border-radius: 7px; font-size: .88rem; outline: none; transition: border-color .15s;
+  }
+  .form-row input:focus, .form-row select:focus { border-color: var(--primary); }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel {
+    background: none; border: 1.5px solid var(--border); border-radius: 7px;
+    padding: 8px 18px; font-size: .88rem; cursor: pointer; color: var(--muted);
+  }
+  .btn-save {
+    background: var(--primary); color: #fff; border: none;
+    border-radius: 7px; padding: 8px 20px; font-size: .88rem; font-weight: 700; cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-save:hover { background: var(--primary-h); }
+
+  /* ===== CPI BADGE ===== */
+  #cpiBadge {
+    position: fixed; bottom: 12px; right: 14px; z-index: 99;
+    background: #cc0000; color: #fff; border-radius: 8px;
+    padding: 5px 12px; font-size: .72rem; font-weight: 700;
+    letter-spacing: .04em; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 6px; user-select: none;
+  }
+  #cpiBadge .cpi-label { opacity: .8; font-weight: 400; }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(32,55,49,0.25); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(32,55,49,0.45); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 700px) {
+    #sidebar { width: 220px; }
+    #appHeader .header-text h1 { font-size: 1rem; }
+  }
+  @media (max-width: 500px) {
+    #sidebar { display: none; }
+    #sidebarToggle { display: flex !important; }
+  }
+  #sidebarToggle { display: none; }
+
+  /* ===== NO DOCS ===== */
+  #noDocs { padding: 24px 14px; text-align: center; color: var(--muted); font-size: .85rem; }
+
+  /* ===== TOAST ===== */
+  #toast {
+    position: fixed; bottom: 60px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #203731; color: #fff; border-radius: 8px; padding: 10px 22px;
+    font-size: .88rem; opacity: 0; pointer-events: none;
+    transition: opacity .25s, transform .25s; z-index: 300;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header id="appHeader">
+  <img id="staLogo" class="logo"
+    src="https://www.supplyone.com/wp-content/themes/supplyone/images/logo-white.png"
+    alt="SupplyOne" onerror="this.style.display='none'">
+  <div class="header-text">
+    <div id="staTitle">SupplyOne Document Station</div>
+    <div id="staSub">Midwest Region &mdash; Wisconsin | 210 Ward Station</div>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn" id="refreshBtn" title="Refresh document list">&#8635; Refresh</button>
+    <button class="gold-btn" id="configBtn">&#9881; Config</button>
+  </div>
+</header>
+
+<!-- ===== BODY ===== -->
+<div id="appBody">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebarTop">
+      <div id="searchWrap">
+        <input id="searchInput" type="text" placeholder="Search documents…" autocomplete="off">
+        <button id="searchClear" title="Clear search">&times;</button>
+      </div>
+    </div>
+    <div id="recentSection" style="display:none;">
+      <div class="section-label">Recent</div>
+      <div id="recentList"></div>
+    </div>
+    <div id="categoryList">
+      <div id="noDocs">Loading documents…</div>
+    </div>
+    <div id="sidebarStatus">
+      <span id="statusDot"></span>
+      <span id="statusText">Connecting…</span>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main id="contentArea">
+    <div id="contentToolbar">
+      <span id="docTitle" style="color:var(--muted)">Select a document</span>
+      <span id="docMeta"></span>
+      <button class="tool-btn" id="downloadBtn" style="display:none" title="Download">&#11015; Download</button>
+      <button class="tool-btn" id="newTabBtn" style="display:none" title="Open in new tab">&#10138; New Tab</button>
+    </div>
+    <div id="viewerWrap">
+      <!-- SPLASH -->
+      <div id="splashScreen">
+        <img class="splash-logo"
+          src="https://www.supplyone.com/wp-content/themes/supplyone/images/logo-white.png"
+          alt="SupplyOne" onerror="this.style.display='none'">
+        <h2>Document Station</h2>
+        <p>Wisconsin Plant &mdash; Midwest Region<br>Select a document from the sidebar to get started.</p>
+        <div class="splash-badge">&#9679; Live from Google Drive</div>
+      </div>
+      <!-- PDF VIEWER -->
+      <div id="pdfViewer">
+        <div id="pdfToolbar">
+          <button id="pdfPrev">&#9664; Prev</button>
+          <span id="pdfPageInfo">Page 1 / 1</span>
+          <button id="pdfNext">Next &#9654;</button>
+          <button id="pdfZoomOut">&#8722;</button>
+          <button id="pdfZoomIn">&#43;</button>
+          <button id="pdfFit">Fit</button>
+          <span id="pdfFilename"></span>
+          <button id="pdfDownload" style="margin-left:auto">&#11015; Download</button>
+        </div>
+        <div id="pdfCanvas"></div>
+      </div>
+      <!-- IMAGE VIEWER -->
+      <div id="imgViewer">
+        <img id="imgEl" src="" alt="">
+        <div class="img-name" id="imgName"></div>
+      </div>
+      <!-- EMBED VIEWER -->
+      <div id="embedViewer">
+        <iframe id="embedFrame" src="" allowfullscreen></iframe>
+      </div>
+      <!-- LOADING OVERLAY -->
+      <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingMsg">Loading document…</p>
+      </div>
+      <!-- ERROR OVERLAY -->
+      <div id="errorOverlay">
+        <div class="err-icon">&#9888;</div>
+        <p id="errorMsg">Unable to load document.</p>
+        <button id="errorClose">Dismiss</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ===== CONFIG MODAL ===== -->
+<div class="modal-backdrop" id="configModal">
+  <div class="modal">
+    <button class="modal-close" id="configClose">&times;</button>
+    <h2>&#9881; Station Configuration</h2>
+    <div class="form-row">
+      <label>Google Drive Folder ID</label>
+      <input id="cfgFolderId" type="text" placeholder="Google Drive Folder ID">
+    </div>
+    <div class="form-row">
+      <label>Google API Key</label>
+      <input id="cfgApiKey" type="text" placeholder="AIza…">
+    </div>
+    <div class="form-row">
+      <label>Facility</label>
+      <select id="cfgFacility">
+        <option value="Wisconsin Plant" selected>Wisconsin Plant</option>
+        <option value="Dallas Plant">Dallas Plant</option>
+        <option value="OKC Plant">Oklahoma City Plant</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Region</label>
+      <input id="cfgRegion" type="text" value="Midwest Region">
+    </div>
+    <div class="form-row">
+      <label>Folder Display Name</label>
+      <input id="cfgFolderName" type="text" value="SupplyOne Documents">
+    </div>
+    <div class="form-row">
+      <label>Refresh Interval (seconds)</label>
+      <input id="cfgRefresh" type="number" min="10" max="3600" value="60">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="configCancel">Cancel</button>
+      <button class="btn-save" id="configSave">Save &amp; Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
+
+<!-- ===== CPI BADGE ===== -->
+<div id="cpiBadge">
+  <span class="cpi-label">Powered by</span> CPI
+</div>
+
+<!-- ===== PDF.JS ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+'use strict';
+
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 's1_wisconsin_station_v1';
+const RECENT_MAX  = 6;
+
+const DEFAULT_CFG = {
+  apiKey:          'AIzaSyDfPzs_qB1rPr0j8wGxlvxYCKtXHh0m_nQ',
+  folderId:        '1MvqR0A9A0JMnrG6eO3nPT8KcA5xw9ipA',
+  folderName:      'SupplyOne Documents',
+  facility:        'Wisconsin Plant',
+  region:          'Midwest Region',
+  refreshInterval: 60
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let cfg         = loadCfg();
+let allDocs     = [];       // { id, name, mimeType, modifiedTime, size }
+let currentDoc  = null;
+let recentDocs  = loadRecent();
+let refreshTimer= null;
+
+// PDF state
+let pdfDoc      = null;
+let pdfPage     = 1;
+let pdfScale    = 1.0;
+let pdfRendering= false;
+let pdfPending  = null;
+
+// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
+function loadCfg() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? Object.assign({}, DEFAULT_CFG, JSON.parse(s)) : Object.assign({}, DEFAULT_CFG);
+  } catch(e) { return Object.assign({}, DEFAULT_CFG); }
+}
+function saveCfg() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); } catch(e) {}
+}
+function loadRecent() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY + '_recent');
+    return s ? JSON.parse(s) : [];
+  } catch(e) { return []; }
+}
+function saveRecent() {
+  try { localStorage.setItem(STORAGE_KEY + '_recent', JSON.stringify(recentDocs)); } catch(e) {}
+}
+
+// ─── UTILITY ─────────────────────────────────────────────────────────────────
+function ext(name) { return (name.split('.').pop() || '').toLowerCase(); }
+function fileIcon(mime, name) {
+  if (mime === 'application/pdf' || ext(name) === 'pdf')          return '📄';
+  if (mime.startsWith('image/'))                                    return '🖼️';
+  if (mime.includes('spreadsheet') || ext(name) === 'xlsx')        return '📊';
+  if (mime.includes('presentation') || ext(name) === 'pptx')       return '📑';
+  if (mime.includes('word') || ext(name) === 'docx')               return '📝';
+  if (mime.includes('video'))                                       return '🎬';
+  return '📎';
+}
+function humanSize(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1024/1024).toFixed(1) + ' MB';
+}
+function guessCategory(name) {
+  const n = name.toLowerCase();
+  if (n.includes('sop') || n.includes('standard operating')) return 'SOPs';
+  if (n.includes('safety') || n.includes('sha') || n.includes('msds') || n.includes('sds')) return 'Safety';
+  if (n.includes('maintenance') || n.includes('pm-')) return 'Maintenance';
+  if (n.includes('quality') || n.includes('qc') || n.includes('inspection')) return 'Quality';
+  if (n.includes('changeover') || n.includes('setup') || n.includes('smed')) return 'Changeover';
+  if (n.includes('downtime') || n.includes('tracking')) return 'Downtime';
+  if (n.includes('pre-') || n.includes('pre_') || n.includes('checklist')) return 'Checklists';
+  if (n.includes('spec') || n.includes('specification')) return 'Specifications';
+  if (n.includes('post') || n.includes('post-')) return 'Post-Ops';
+  if (n.includes('spare') || n.includes('parts') || n.includes('spi')) return 'Parts & Inventory';
+  return 'General';
+}
+function toast(msg, dur=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ─── GOOGLE DRIVE API ─────────────────────────────────────────────────────────
+async function fetchDriveDocs() {
+  const { apiKey, folderId } = cfg;
+  if (!apiKey || !folderId) return [];
+  const url = `https://www.googleapis.com/drive/v3/files?` +
+    `q='${folderId}'+in+parents+and+trashed=false` +
+    `&fields=files(id,name,mimeType,modifiedTime,size)` +
+    `&pageSize=200&orderBy=name&key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Drive API ${res.status}: ${res.statusText}`);
+  const data = await res.json();
+  return data.files || [];
+}
+
+function driveDownloadUrl(fileId) {
+  return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${encodeURIComponent(cfg.apiKey)}`;
+}
+function drivePreviewUrl(fileId) {
+  return `https://drive.google.com/file/d/${fileId}/preview`;
+}
+
+// ─── DOCUMENT LIST ────────────────────────────────────────────────────────────
+async function loadDocs() {
+  setStatus('loading', 'Refreshing…');
+  try {
+    allDocs = await fetchDriveDocs();
+    renderSidebar(allDocs);
+    setStatus('live', `${allDocs.length} docs — ${new Date().toLocaleTimeString()}`);
+  } catch(e) {
+    console.error(e);
+    setStatus('error', 'Drive error — check config');
+    renderSidebar([]);
+    showError(`Could not load documents: ${e.message}`);
+  }
+}
+
+function renderSidebar(docs) {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  const filtered = q ? docs.filter(d => d.name.toLowerCase().includes(q)) : docs;
+
+  // Group by category
+  const cats = {};
+  filtered.forEach(d => {
+    const c = guessCategory(d.name);
+    if (!cats[c]) cats[c] = [];
+    cats[c].push(d);
+  });
+
+  const container = document.getElementById('categoryList');
+  if (!filtered.length) {
+    container.innerHTML = `<div id="noDocs">${q ? 'No results for "'+q+'"' : (cfg.folderId ? 'No documents found.' : 'Configure a Drive folder to begin.')}</div>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  Object.keys(cats).sort().forEach(cat => {
+    const section  = document.createElement('div');
+    section.className = 'cat-section';
+    const header = document.createElement('div');
+    header.className = 'cat-header open';
+    header.innerHTML = `<span>${cat}</span><span class="doc-badge">${cats[cat].length}</span><span class="cat-arrow">&#9658;</span>`;
+    const docList = document.createElement('div');
+    docList.className = 'cat-docs open';
+    cats[cat].forEach(doc => {
+      const item = document.createElement('div');
+      item.className = 'doc-item' + (currentDoc && currentDoc.id === doc.id ? ' active' : '');
+      item.innerHTML = `<span class="doc-icon">${fileIcon(doc.mimeType, doc.name)}</span><span class="doc-label">${doc.name}</span>`;
+      item.title = doc.name;
+      item.addEventListener('click', () => openDoc(doc));
+      docList.appendChild(item);
+    });
+    header.addEventListener('click', () => {
+      header.classList.toggle('open');
+      docList.classList.toggle('open');
+    });
+    section.appendChild(header);
+    section.appendChild(docList);
+    container.appendChild(section);
+  });
+
+  renderRecent();
+}
+
+function renderRecent() {
+  const sec  = document.getElementById('recentSection');
+  const list = document.getElementById('recentList');
+  if (!recentDocs.length) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = '';
+  recentDocs.slice(0, RECENT_MAX).forEach(r => {
+    const item = document.createElement('div');
+    item.className = 'recent-item';
+    item.innerHTML = `<span>${fileIcon(r.mimeType||'', r.name)}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.name}</span>`;
+    item.title = r.name;
+    item.addEventListener('click', () => {
+      const live = allDocs.find(d => d.id === r.id);
+      if (live) openDoc(live);
+      else { toast('Document no longer available.'); }
+    });
+    list.appendChild(item);
+  });
+}
+
+// ─── OPEN / VIEW DOC ──────────────────────────────────────────────────────────
+function openDoc(doc) {
+  currentDoc = doc;
+  // Mark active
+  document.querySelectorAll('.doc-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.doc-item').forEach(el => {
+    if (el.querySelector('.doc-label') && el.querySelector('.doc-label').textContent === doc.name)
+      el.classList.add('active');
+  });
+  // Update toolbar
+  document.getElementById('docTitle').textContent = doc.name;
+  document.getElementById('docTitle').style.color = '';
+  document.getElementById('docMeta').textContent  = humanSize(doc.size ? parseInt(doc.size) : 0);
+  document.getElementById('downloadBtn').style.display = '';
+  document.getElementById('newTabBtn').style.display    = '';
+  document.getElementById('downloadBtn').onclick = () => downloadDoc(doc);
+  document.getElementById('newTabBtn').onclick   = () => window.open(drivePreviewUrl(doc.id), '_blank');
+  // Recent
+  recentDocs = recentDocs.filter(r => r.id !== doc.id);
+  recentDocs.unshift({ id: doc.id, name: doc.name, mimeType: doc.mimeType });
+  if (recentDocs.length > RECENT_MAX) recentDocs = recentDocs.slice(0, RECENT_MAX);
+  saveRecent();
+  renderRecent();
+  // Dispatch to appropriate viewer
+  hideSplash();
+  const mime = doc.mimeType || '';
+  const e    = ext(doc.name);
+  if (mime === 'application/pdf' || e === 'pdf') {
+    viewPdf(doc);
+  } else if (mime.startsWith('image/') || ['png','jpg','jpeg','gif','webp','svg','bmp'].includes(e)) {
+    viewImage(doc);
+  } else {
+    viewEmbed(doc);
+  }
+}
+
+function hideSplash() {
+  document.getElementById('splashScreen').style.display = 'none';
+}
+function hideAllViewers() {
+  document.getElementById('pdfViewer').classList.remove('active');
+  document.getElementById('imgViewer').classList.remove('active');
+  document.getElementById('embedViewer').classList.remove('active');
+}
+function showLoading(msg) {
+  const ol = document.getElementById('loadingOverlay');
+  document.getElementById('loadingMsg').textContent = msg || 'Loading…';
+  ol.classList.add('active');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('errorOverlay').classList.add('active');
+}
+function hideError() {
+  document.getElementById('errorOverlay').classList.remove('active');
+}
+
+// ─── PDF VIEWER ───────────────────────────────────────────────────────────────
+async function viewPdf(doc) {
+  hideAllViewers();
+  showLoading('Loading PDF…');
+  document.getElementById('pdfViewer').classList.add('active');
+  document.getElementById('pdfFilename').textContent = doc.name;
+
+  try {
+    if (typeof pdfjsLib === 'undefined') throw new Error('PDF.js not loaded');
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const url = driveDownloadUrl(doc.id);
+    pdfDoc = await pdfjsLib.getDocument({ url, withCredentials: false }).promise;
+    pdfPage  = 1;
+    pdfScale = 1.0;
+    updatePdfPageInfo();
+    await renderPdfPage();
+    hideLoading();
+  } catch(e) {
+    hideLoading();
+    // Fall back to embed
+    console.warn('PDF.js failed, falling back to embed:', e);
+    viewEmbed(doc);
+  }
+}
+
+async function renderPdfPage() {
+  if (!pdfDoc) return;
+  if (pdfRendering) { pdfPending = pdfPage; return; }
+  pdfRendering = true;
+  const page = await pdfDoc.getPage(pdfPage);
+  const viewport = page.getViewport({ scale: pdfScale });
+  const container = document.getElementById('pdfCanvas');
+  container.innerHTML = '';
+  const canvas = document.createElement('canvas');
+  canvas.width  = viewport.width;
+  canvas.height = viewport.height;
+  container.appendChild(canvas);
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+  pdfRendering = false;
+  if (pdfPending !== null) {
+    pdfPage = pdfPending; pdfPending = null;
+    updatePdfPageInfo();
+    renderPdfPage();
+  }
+}
+function updatePdfPageInfo() {
+  document.getElementById('pdfPageInfo').textContent =
+    `Page ${pdfPage} / ${pdfDoc ? pdfDoc.numPages : '?'}`;
+}
+
+// ─── IMAGE VIEWER ─────────────────────────────────────────────────────────────
+function viewImage(doc) {
+  hideAllViewers();
+  showLoading('Loading image…');
+  const iv = document.getElementById('imgViewer');
+  iv.classList.add('active');
+  const img = document.getElementById('imgEl');
+  img.onload  = hideLoading;
+  img.onerror = () => { hideLoading(); showError('Failed to load image.'); };
+  img.src = driveDownloadUrl(doc.id);
+  document.getElementById('imgName').textContent = doc.name;
+}
+
+// ─── EMBED VIEWER ─────────────────────────────────────────────────────────────
+function viewEmbed(doc) {
+  hideAllViewers();
+  showLoading('Loading document…');
+  const ev = document.getElementById('embedViewer');
+  ev.classList.add('active');
+  const frame = document.getElementById('embedFrame');
+  frame.onload = hideLoading;
+  frame.src = drivePreviewUrl(doc.id);
+}
+
+// ─── DOWNLOAD ─────────────────────────────────────────────────────────────────
+function downloadDoc(doc) {
+  const a = document.createElement('a');
+  a.href     = driveDownloadUrl(doc.id);
+  a.download = doc.name;
+  a.target   = '_blank';
+  a.click();
+}
+
+// ─── STATUS ───────────────────────────────────────────────────────────────────
+function setStatus(state, msg) {
+  const dot  = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className = '';
+  if (state === 'live')    dot.classList.add('live');
+  if (state === 'error')   dot.classList.add('error');
+  text.textContent = msg;
+}
+
+// ─── SEARCH ───────────────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  document.getElementById('searchClear').style.display = this.value ? 'block' : 'none';
+  renderSidebar(allDocs);
+});
+document.getElementById('searchClear').addEventListener('click', function() {
+  document.getElementById('searchInput').value = '';
+  this.style.display = 'none';
+  renderSidebar(allDocs);
+});
+
+// ─── PDF CONTROLS ─────────────────────────────────────────────────────────────
+document.getElementById('pdfPrev').addEventListener('click', () => {
+  if (pdfDoc && pdfPage > 1) { pdfPage--; updatePdfPageInfo(); renderPdfPage(); }
+});
+document.getElementById('pdfNext').addEventListener('click', () => {
+  if (pdfDoc && pdfPage < pdfDoc.numPages) { pdfPage++; updatePdfPageInfo(); renderPdfPage(); }
+});
+document.getElementById('pdfZoomIn').addEventListener('click', () => {
+  pdfScale = Math.min(pdfScale + 0.25, 4.0); renderPdfPage();
+});
+document.getElementById('pdfZoomOut').addEventListener('click', () => {
+  pdfScale = Math.max(pdfScale - 0.25, 0.5); renderPdfPage();
+});
+document.getElementById('pdfFit').addEventListener('click', () => {
+  pdfScale = 1.0; renderPdfPage();
+});
+document.getElementById('pdfDownload').addEventListener('click', () => {
+  if (currentDoc) downloadDoc(currentDoc);
+});
+
+// ─── ERROR CLOSE ──────────────────────────────────────────────────────────────
+document.getElementById('errorClose').addEventListener('click', hideError);
+
+// ─── CONFIG MODAL ─────────────────────────────────────────────────────────────
+function openConfig() {
+  document.getElementById('cfgFolderId').value   = cfg.folderId        || '';
+  document.getElementById('cfgApiKey').value     = cfg.apiKey          || '';
+  document.getElementById('cfgFacility').value   = cfg.facility        || 'Wisconsin Plant';
+  document.getElementById('cfgRegion').value     = cfg.region          || 'Midwest Region';
+  document.getElementById('cfgFolderName').value = cfg.folderName      || 'SupplyOne Documents';
+  document.getElementById('cfgRefresh').value    = cfg.refreshInterval || 60;
+  document.getElementById('configModal').classList.add('active');
+}
+function closeConfig() {
+  document.getElementById('configModal').classList.remove('active');
+}
+document.getElementById('configBtn').addEventListener('click', openConfig);
+document.getElementById('configClose').addEventListener('click', closeConfig);
+document.getElementById('configCancel').addEventListener('click', closeConfig);
+document.getElementById('configModal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfig();
+});
+document.getElementById('configSave').addEventListener('click', () => {
+  cfg.folderId        = document.getElementById('cfgFolderId').value.trim();
+  cfg.apiKey          = document.getElementById('cfgApiKey').value.trim();
+  cfg.facility        = document.getElementById('cfgFacility').value;
+  cfg.region          = document.getElementById('cfgRegion').value.trim();
+  cfg.folderName      = document.getElementById('cfgFolderName').value.trim();
+  cfg.refreshInterval = parseInt(document.getElementById('cfgRefresh').value) || 60;
+  saveCfg();
+  closeConfig();
+  updateHeaderSubtitle();
+  scheduleRefresh();
+  loadDocs();
+  toast('Configuration saved!');
+});
+
+function updateHeaderSubtitle() {
+  document.getElementById('staSub').innerHTML =
+    `${cfg.region} &mdash; ${cfg.facility}`;
+}
+
+// ─── REFRESH ──────────────────────────────────────────────────────────────────
+document.getElementById('refreshBtn').addEventListener('click', () => {
+  loadDocs();
+  toast('Refreshing…');
+});
+function scheduleRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  const ms = (cfg.refreshInterval || 60) * 1000;
+  refreshTimer = setInterval(loadDocs, ms);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+(function init() {
+  // Apply saved subtitle
+  // Keep the default in HTML as the starting value; only override if cfg differs from defaults
+  if (cfg.region !== DEFAULT_CFG.region || cfg.facility !== DEFAULT_CFG.facility) {
+    updateHeaderSubtitle();
+  }
+  scheduleRefresh();
+  loadDocs();
+})();
+</script>
+</body>
+</html>
