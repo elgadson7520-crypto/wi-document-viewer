@@ -80,40 +80,45 @@
     background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem;
     display: none;
   }
-  #categoryList { flex: 1; overflow-y: auto; padding: 0 8px 14px; }
-  .cat-section { margin-bottom: 4px; }
+  #categoryList { flex: 1; overflow-y: auto; padding: 6px 10px 14px; }
+  .cat-section { margin-bottom: 6px; }
   .cat-header {
-    display: flex; align-items: center; gap: 7px;
-    padding: 7px 8px; border-radius: 7px; cursor: pointer;
-    font-weight: 600; font-size: .84rem; color: var(--primary);
-    user-select: none; transition: background .12s;
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 10px; border-radius: 8px; cursor: pointer;
+    font-weight: 600; font-size: .85rem; color: var(--primary);
+    user-select: none; transition: background .15s;
+    border: 1px solid transparent;
   }
-  .cat-header:hover { background: #f0f4f3; }
-  .cat-header .cat-arrow { font-size: .7rem; transition: transform .18s; margin-left: auto; }
+  .cat-header:hover { background: rgba(32,55,49,0.06); border-color: var(--border); }
+  .cat-header .cat-arrow { font-size: .65rem; transition: transform .2s; margin-left: auto; color: var(--muted); }
   .cat-header.open .cat-arrow { transform: rotate(90deg); }
-  .cat-docs { display: none; padding-left: 12px; }
+  .cat-header .cat-icon { font-size: 1.05rem; flex-shrink: 0; }
+  .cat-docs { display: none; padding: 2px 0 4px 6px; border-left: 2px solid rgba(32,55,49,0.1); margin-left: 18px; }
   .cat-docs.open { display: block; }
   .doc-item {
     display: flex; align-items: center; gap: 8px;
-    padding: 6px 8px; border-radius: 6px; cursor: pointer;
-    font-size: .82rem; color: var(--text); transition: background .12s;
+    padding: 7px 10px; border-radius: 6px; cursor: pointer;
+    font-size: .82rem; color: var(--text); transition: all .15s;
+    line-height: 1.3;
   }
-  .doc-item:hover { background: #f0f4f3; }
-  .doc-item.active { background: rgba(32,55,49,0.10); color: var(--primary); font-weight: 600; }
-  .doc-icon { font-size: 1rem; flex-shrink: 0; }
+  .doc-item:hover { background: rgba(32,55,49,0.06); }
+  .doc-item.active { background: rgba(32,55,49,0.12); color: var(--primary); font-weight: 600; border-left: 3px solid var(--gold); }
+  .doc-icon { font-size: .95rem; flex-shrink: 0; }
+  .doc-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .doc-badge {
     margin-left: auto; background: var(--gold); color: #203731;
-    font-size: .68rem; font-weight: 700; border-radius: 10px; padding: 1px 6px;
+    font-size: .66rem; font-weight: 700; border-radius: 10px; padding: 2px 7px;
+    flex-shrink: 0;
   }
-  #recentSection { padding: 0 14px 10px; border-bottom: 1px solid var(--border); }
-  .section-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
+  #recentSection { padding: 8px 14px 10px; border-bottom: 1px solid var(--border); background: rgba(32,55,49,0.03); }
+  .section-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--gold); margin-bottom: 6px; }
   .recent-item {
     display: flex; align-items: center; gap: 7px;
-    padding: 5px 6px; border-radius: 6px; cursor: pointer;
+    padding: 6px 8px; border-radius: 6px; cursor: pointer;
     font-size: .8rem; color: var(--text); transition: background .12s;
   }
-  .recent-item:hover { background: #f0f4f3; }
-  #sidebarStatus { padding: 8px 14px; font-size: .72rem; color: var(--muted); border-top: 1px solid var(--border); }
+  .recent-item:hover { background: rgba(32,55,49,0.06); }
+  #sidebarStatus { padding: 10px 14px; font-size: .72rem; color: var(--muted); border-top: 1px solid var(--border); background: rgba(32,55,49,0.03); }
   #statusDot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; margin-right: 5px; }
   #statusDot.live { background: #22c55e; }
   #statusDot.error { background: #ef4444; }
@@ -306,7 +311,7 @@
     alt="SupplyOne" onerror="this.style.display='none'">
   <div class="header-text">
     <div id="staTitle">SupplyOne Document Station</div>
-    <div id="staSub">Midwest Region &mdash; Wisconsin | 210 Ward Station</div>
+    <div id="staSub">Southwest Region &mdash; Wisconsin | 210 Ward Station</div>
   </div>
   <div class="header-actions">
     <button class="header-btn" id="refreshBtn" title="Refresh document list">&#8635; Refresh</button>
@@ -353,7 +358,7 @@
           src="https://www.supplyone.com/wp-content/themes/supplyone/images/logo-white.png"
           alt="SupplyOne" onerror="this.style.display='none'">
         <h2>Document Station</h2>
-        <p>Wisconsin Plant &mdash; Midwest Region<br>Select a document from the sidebar to get started.</p>
+        <p>Wisconsin Plant &mdash; Southwest Region<br>Select a document from the sidebar to get started.</p>
         <div class="splash-badge">&#9679; Live from Google Drive</div>
       </div>
       <!-- PDF VIEWER -->
@@ -417,7 +422,7 @@
     </div>
     <div class="form-row">
       <label>Region</label>
-      <input id="cfgRegion" type="text" value="Midwest Region">
+      <input id="cfgRegion" type="text" value="Southwest Region">
     </div>
     <div class="form-row">
       <label>Folder Display Name</label>
@@ -456,7 +461,7 @@ const DEFAULT_CFG = {
   folderId:        '1MvqR0A9A0JMnrG6eO3nPT8KcA5xw9ipA',
   folderName:      'SupplyOne Documents',
   facility:        'Wisconsin Plant',
-  region:          'Midwest Region',
+  region:          'Southwest Region',
   refreshInterval: 60
 };
 
@@ -513,15 +518,18 @@ function humanSize(bytes) {
 }
 function guessCategory(name) {
   const n = name.toLowerCase();
-  if (n.includes('sop') || n.includes('standard operating')) return 'SOPs';
-  if (n.includes('safety') || n.includes('sha') || n.includes('msds') || n.includes('sds')) return 'Safety';
-  if (n.includes('maintenance') || n.includes('pm-')) return 'Maintenance';
-  if (n.includes('quality') || n.includes('qc') || n.includes('inspection')) return 'Quality';
+  if (n.includes('sop') || n.includes('standard operating') || n.includes('start-up') || n.includes('shutdown') || n.includes('scrap') || n.includes('escalation')) return 'SOPs';
+  if (n.includes('safety') || n.includes('sha') || n.includes('saf') || n.includes('hazard') || n.includes('msds') || n.includes('sds')) return 'Safety';
+  if (n.includes('maintenance') || n.includes('mnt') || n.includes('pm-')) return 'Maintenance';
+  if (n.includes('quality') || n.includes('qc') || n.includes('qcp') || n.includes('inspection')) return 'Quality';
   if (n.includes('changeover') || n.includes('setup') || n.includes('smed')) return 'Changeover';
   if (n.includes('downtime') || n.includes('tracking')) return 'Downtime';
-  if (n.includes('pre-') || n.includes('pre_') || n.includes('checklist')) return 'Checklists';
+  if (n.includes('pre-') || n.includes('pre_') || n.includes('post-') || n.includes('post_') || n.includes('chk') || n.includes('checklist')) return 'Checklists';
+  if (n.includes('training') || n.includes('trn')) return 'Training';
+  if (n.includes('overview') || n.includes('ovr')) return 'Overview';
+  if (n.includes('standard_work') || n.includes('stw') || n.includes('standard work')) return 'Standard Work';
+  if (n.includes('troubleshoot') || n.includes('tsg')) return 'Troubleshooting';
   if (n.includes('spec') || n.includes('specification')) return 'Specifications';
-  if (n.includes('post') || n.includes('post-')) return 'Post-Ops';
   if (n.includes('spare') || n.includes('parts') || n.includes('spi')) return 'Parts & Inventory';
   return 'General';
 }
@@ -592,7 +600,8 @@ function renderSidebar(docs) {
     section.className = 'cat-section';
     const header = document.createElement('div');
     header.className = 'cat-header open';
-    header.innerHTML = `<span>${cat}</span><span class="doc-badge">${cats[cat].length}</span><span class="cat-arrow">&#9658;</span>`;
+    const catIcons = {SOPs:'📋',Safety:'⚠️',Maintenance:'🔧',Quality:'✅',Changeover:'🔄',Downtime:'⏱️',Checklists:'☑️',Specifications:'📐','Post-Ops':'📦','Parts & Inventory':'🔩',General:'📎',Training:'🎓',Overview:'📘','Standard Work':'📏',Troubleshooting:'🔍'};
+    header.innerHTML = `<span class="cat-icon">${catIcons[cat]||'📁'}</span><span>${cat}</span><span class="doc-badge">${cats[cat].length}</span><span class="cat-arrow">&#9658;</span>`;
     const docList = document.createElement('div');
     docList.className = 'cat-docs open';
     cats[cat].forEach(doc => {
@@ -829,7 +838,7 @@ function openConfig() {
   document.getElementById('cfgFolderId').value   = cfg.folderId        || '';
   document.getElementById('cfgApiKey').value     = cfg.apiKey          || '';
   document.getElementById('cfgFacility').value   = cfg.facility        || 'Wisconsin Plant';
-  document.getElementById('cfgRegion').value     = cfg.region          || 'Midwest Region';
+  document.getElementById('cfgRegion').value     = cfg.region          || 'Southwest Region';
   document.getElementById('cfgFolderName').value = cfg.folderName      || 'SupplyOne Documents';
   document.getElementById('cfgRefresh').value    = cfg.refreshInterval || 60;
   document.getElementById('configModal').classList.add('active');
