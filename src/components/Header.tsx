@@ -18,8 +18,7 @@ const quickLinks = [
   { label: "Training", search: "TRN", icon: "BookOpen" },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, typeof FileText> = {
   FileText,
   ClipboardCheck,
   Shield,
