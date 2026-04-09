@@ -18,7 +18,8 @@ const quickLinks = [
   { label: "Training", search: "TRN", icon: "BookOpen" },
 ];
 
-const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const iconMap: Record<string, any> = {
   FileText,
   ClipboardCheck,
   Shield,
@@ -117,7 +118,10 @@ export default function Header({
 
         {/* Right side - Search */}
         <div className="relative hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            size={18}
+          />
           <input
             type="text"
             placeholder="Search documents..."
