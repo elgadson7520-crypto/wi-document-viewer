@@ -40,7 +40,7 @@ export default function Header({
     <header className="sticky top-0 z-40 bg-packers-green relative gold-accent">
       {/* Live Date/Time Bar */}
       <div className="w-full bg-packers-green-dark text-gray-300 text-xs py-1 px-4 lg:px-6 flex justify-end items-center border-b border-white/10">
-        <span>{dateString} \u2022 {timeString}</span>
+        <span>{dateString} • {timeString}</span>
       </div>
       <div className="flex items-center justify-between px-4 py-3 lg:px-6">
         {/* Left side */}
